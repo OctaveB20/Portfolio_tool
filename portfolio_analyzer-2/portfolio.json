@@ -5,14 +5,14 @@
       "name": "CrowdStrike",
       "shares": 1.61658312,
       "avg_price": 100.29,
-      "category": "Equity"
+      "category": "Speculative"
     },
     {
-      "ticker": "KTOS",
-      "name": "Kratos Defense",
-      "shares": 1.00686957,
-      "avg_price": 115.0,
-      "category": "Equity"
+      "ticker": "CRDO",
+      "name": "Credo Technology",
+      "shares": 1.14786576,
+      "avg_price": 172.23,
+      "category": "Speculative"
     },
     {
       "ticker": "NVNO",
@@ -22,10 +22,10 @@
       "category": "Speculative"
     },
     {
-      "ticker": "MU",
-      "name": "Micron Technology",
-      "shares": 0.16699261,
-      "avg_price": 969.15,
+      "ticker": "QQQ3.MI",
+      "name": "wisdomtree NASDAQ 3x leverage",
+      "shares": 0.3037296,
+      "avg_price": 363,81,
       "category": "Equity"
     },
     {
@@ -66,15 +66,15 @@
     {
       "ticker": "JEDI.MI",
       "name": "VanEck Space Innovators",
-      "shares": 4.75053651,
-      "avg_price": 81.86,
+      "shares": 6.0145615,
+      "avg_price": 79.46,
       "category": "Satellite"
     },
     {
       "ticker": "QDVE.DE",
       "name": "iShares S&P 500 IT Sector",
-      "shares": 10.46047027,
-      "avg_price": 39.87,
+      "shares": 10.82128441,
+      "avg_price": 40.16,
       "category": "Core ETF"
     },
     {
@@ -87,15 +87,8 @@
     {
       "ticker": "DBXJ.DE",
       "name": "Xtrackers MSCI Japan",
-      "shares": 2.997151,
-      "avg_price": 96.87,
-      "category": "Core ETF"
-    },
-    {
-      "ticker": "ORCL",
-      "name": "Oracle",
-      "shares": 1.89286808,
-      "avg_price": 143.46,
+      "shares": 3.27957075,
+      "avg_price": 97.67,
       "category": "Core ETF"
     },
     {
@@ -106,7 +99,7 @@
       "category": "Core ETF"
     }
   ],
-  "benchmark": "VWCE.AS",
+  "benchmark": "VUAA.DE",
   "currency": "mixed",
   "period": "1y"
 }
