@@ -580,31 +580,83 @@ with tab_risk:
 with tab_correlations:
     st.markdown("### Correlation matrix — daily returns")
 
-    if len(price_series) >= 2:
-        corr = correlation_matrix(price_series)
-        fig = go.Figure(go.Heatmap(
-            z=corr.values,
-            x=corr.columns.tolist(),
-            y=corr.index.tolist(),
-            colorscale=[[0.0, "#f85149"], [0.5, "#0d1117"], [1.0, "#3fb950"]],
-            zmid=0, zmin=-1, zmax=1,
-            text=corr.round(2).values,
-            texttemplate="%{text}",
-            hoverongaps=False,
-        ))
-        fig.update_layout(**PLOTLY_LAYOUT, height=520)
-        st.plotly_chart(fig, width="stretch", key="corr_heatmap")
+    corr_window = st.selectbox(
+        "Window", ["1mo", "3mo", "6mo", "1y", "2y"], index=2, key="corr_window",
+        help="Independent from the sidebar period: correlations on 1d/5d are meaningless.",
+    )
+    MIN_OBS = 15  # minimum number of daily returns needed for a pair
 
-        st.markdown("#### Insights")
-        corr_vals  = corr.where(np.triu(np.ones(corr.shape), k=1).astype(bool))
-        corr_stack = corr_vals.stack().sort_values()
-        if not corr_stack.empty:
-            most_pos = corr_stack.iloc[-1]
-            most_neg = corr_stack.iloc[0]
-            st.info(f"**Most correlated pair:** {corr_stack.index[-1][0]} × {corr_stack.index[-1][1]} → {most_pos:.2f}")
-            st.info(f"**Least correlated pair:** {corr_stack.index[0][0]} × {corr_stack.index[0][1]} → {most_neg:.2f}")
+    def _clean_close(ticker: str, window: str):
+        """Close series with a tz-naive, date-only index (aligns EU/US tickers)."""
+        df = fetch_ticker_data(ticker, window)
+        if df is None or df.empty:
+            return None
+        s = df["Close"].dropna()
+        if s.empty:
+            return None
+        idx = pd.to_datetime(s.index)
+        if getattr(idx, "tz", None) is not None:
+            idx = idx.tz_localize(None)          # keep local wall-clock date
+        s.index = idx.normalize()
+        return s[~s.index.duplicated(keep="last")].sort_index()
+
+    corr_series, skipped = {}, []
+    for h in holdings:
+        s_ = _clean_close(h["ticker"], corr_window)
+        if s_ is None or len(s_) < MIN_OBS + 1:
+            skipped.append(h["ticker"])
+        else:
+            corr_series[h["ticker"]] = s_
+
+    if skipped:
+        st.caption(f"Excluded (not enough data over {corr_window}): {', '.join(skipped)}")
+
+    if len(corr_series) < 2:
+        st.info("Need at least 2 positions with enough history to build a correlation matrix. "
+                "Try a longer window.")
     else:
-        st.info("Need at least 2 positions with data to build a correlation matrix.")
+        # returns computed on each ticker's own trading days, then aligned by date
+        rets = pd.DataFrame({k: v.pct_change() for k, v in corr_series.items()})
+        rets = rets.replace([np.inf, -np.inf], np.nan).dropna(how="all")
+        corr = rets.corr(min_periods=MIN_OBS)                    # pairwise, ignores NaN
+        corr = corr.dropna(how="all").dropna(axis=1, how="all")
+
+        if corr.shape[0] < 2:
+            st.warning("Not enough overlapping dates between positions to compute correlations.")
+        else:
+            vals = corr.values
+            labels = np.where(np.isnan(vals), "", np.char.mod("%.2f", vals))
+            fig = go.Figure(go.Heatmap(
+                z=vals,
+                x=corr.columns.tolist(),
+                y=corr.index.tolist(),
+                colorscale=[[0.0, RED], [0.5, "#0d1117"], [1.0, GREEN]],
+                zmin=-1, zmax=1,
+                text=labels,
+                texttemplate="%{text}",
+                hoverongaps=False,
+                colorbar=dict(title="ρ"),
+            ))
+            fig.update_layout(**PLOTLY_LAYOUT, height=max(420, 40 * len(corr) + 120))
+            fig.update_yaxes(autorange="reversed")
+            st.plotly_chart(fig, width="stretch", key="corr_heatmap")
+            st.caption(f"{len(rets)} daily observations · pairwise correlation · "
+                       "EU/US tickers close at different times, so cross-region correlations "
+                       "are slightly understated.")
+
+            st.markdown("#### Insights")
+            mask = np.triu(np.ones(corr.shape, dtype=bool), k=1)
+            pairs = corr.where(mask).stack().sort_values()
+            if not pairs.empty:
+                st.info(f"**Most correlated pair:** {pairs.index[-1][0]} × {pairs.index[-1][1]} → {pairs.iloc[-1]:.2f}")
+                st.info(f"**Least correlated pair:** {pairs.index[0][0]} × {pairs.index[0][1]} → {pairs.iloc[0]:.2f}")
+
+                avg_corr = (corr.sum() - 1) / (len(corr) - 1)   # mean correlation vs the others
+                avg_df = (avg_corr.sort_values()
+                          .rename("Avg correlation").round(2).reset_index()
+                          .rename(columns={"index": "Ticker"}))
+                st.markdown("#### Diversifiers (lowest average correlation first)")
+                st.dataframe(avg_df, width="stretch", hide_index=True, key="corr_avg_table")
 
 # ══════════════════════════════════════════════════════════════════
 # TAB 5 — FUNDAMENTALS
