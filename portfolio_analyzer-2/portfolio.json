@@ -1,17 +1,10 @@
 {
   "holdings": [
     {
-      "ticker": "CRWD",
-      "name": "CrowdStrike",
-      "shares": 1.61658312,
-      "avg_price": 100.29,
-      "category": "Speculative"
-    },
-    {
       "ticker": "CRDO",
       "name": "Credo Technology",
-      "shares": 1.14786576,
-      "avg_price": 172.23,
+      "shares": 1.481861,
+      "avg_price": 173.14,
       "category": "Speculative"
     },
     {
@@ -24,15 +17,15 @@
     {
       "ticker": "QQQ3.MI",
       "name": "wisdomtree NASDAQ 3x leverage",
-      "shares": 0.3037296,
-      "avg_price": 363.81,
+      "shares": 0.4142596,
+      "avg_price": 365.71,
       "category": "Equity"
     },
     {
       "ticker": "GOOGL",
       "name": "Alphabet (Class A)",
-      "shares": 1.70098954,
-      "avg_price": 341.57,
+      "shares": 1.84105833,
+      "avg_price": 342.12,
       "category": "Equity"
     },
     {
@@ -59,8 +52,8 @@
     {
       "ticker": "FLXT.PA",
       "name": "Franklin FTSE Taiwan",
-      "shares": 6.196666,
-      "avg_price": 56.47,
+      "shares": 6.57497696,
+      "avg_price": 56.87,
       "category": "Satellite"
     },
     {
@@ -73,8 +66,8 @@
     {
       "ticker": "QDVE.DE",
       "name": "iShares S&P 500 IT Sector",
-      "shares": 10.82128441,
-      "avg_price": 40.16,
+      "shares": 12.18168173,
+      "avg_price": 40.85,
       "category": "Core ETF"
     },
     {
